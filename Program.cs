@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -13,6 +13,7 @@ namespace Snake
         public static int x = 4;
         public static int Tail = 1;
         public static string vect = "right";
+        public static string Head = ">";
         public static int timetomove = 500;
     }
     class Field
@@ -45,7 +46,8 @@ namespace Snake
                     }
                     else if (MetField[i, j] == Data.Tail)
                     {
-                        Console.Write("$");
+                        Console.Write(Data.Head);
+
                     }
                     else if (MetField[i, j] < Data.Tail)
                     {
@@ -65,7 +67,22 @@ namespace Snake
             }
             Console.WriteLine("--------------------\n");
             Console.WriteLine("Направление: " + Data.vect);
-            Console.WriteLine("Длина хвоста:" + (Data.Tail - 1).ToString());
+            Console.WriteLine("Длина хвоста: " + (Data.Tail - 1).ToString());
+            Console.WriteLine("Скорость игры: "+(50-Data.timetomove/10).ToString());
+        }
+        public void AddLiveForTail()
+        {
+            for (int i = 0; i < 10; i++)
+            {
+                for (int j = 0; j < 10; j++)
+                {
+                    if (MetField[i, j] < Data.Tail && MetField[i, j] != 0)
+                    {
+                        MetField[i, j] += 1;
+                    }
+                }
+                Console.Write("|\n");
+            }
         }
         public void DoStep()
         {
@@ -82,18 +99,22 @@ namespace Snake
             if (Data.vect == "right")
             {
                 Data.x += 1;
+                Data.Head = ">";
             }
             else if (Data.vect == "left")
             {
                 Data.x -= 1;
+                Data.Head = "<";
             }
             else if (Data.vect == "up")
             {
                 Data.y -= 1;
+                Data.Head = "^";
             }
             else if (Data.vect == "down")
             {
                 Data.y += 1;
+                Data.Head = "v";
             }
         }
     }
@@ -146,6 +167,11 @@ namespace Snake
                     Data.vect = "right";
                     MainField.ShowField();
                 }
+                else if (me.Key == ConsoleKey.P)
+                {
+                    Console.WriteLine("ause");
+                    while (Console.ReadKey().Key != ConsoleKey.P) { }
+                }
                 long Notnow = DateTime.Now.Ticks / TimeSpan.TicksPerMillisecond;
                 if (Notnow - now > Data.timetomove)
                 {
@@ -159,6 +185,7 @@ namespace Snake
                     }
                     if (MainField.MetField[Data.y, Data.x] == 9999)
                     {
+                        Data.timetomove -= 5;
                         bool F = false;
                         while (!F)
                         {
@@ -170,14 +197,15 @@ namespace Snake
                                 F = true;
                                 Data.Tail += 1;
                                 MainField.MetField[rnd1, rnd2] = 9999;
+                                MainField.AddLiveForTail();
                             }
                         }
                     }
+                    
                     MainField.MetField[Data.y, Data.x] = Data.Tail;
                     MainField.ShowField();
                 }
             }
-            Console.Clear();
             Console.WriteLine("Game Over");
             Console.WriteLine("Your score: " + Data.Tail.ToString());
             Console.ReadKey();
